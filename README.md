@@ -1,4 +1,4 @@
 # TO RUN
 
-1. npm run dev --workspace=@my-workspace/ui
-2. npm run dev --workspace=main-app
+1. npm run ui:dev
+2. npm run app:dev
