@@ -1,5 +1,9 @@
 {
   "private": true,
+  "scripts": {
+    "ui:dev": "npm run dev --workspace=@my-workspace/ui",
+    "app:dev": "npm run dev --workspace=main-app"
+  },
   "workspaces": [
     "apps/*",
     "packages/*"
