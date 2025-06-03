@@ -11,6 +11,12 @@ import { fetchUsers, type UsersFilters } from "./userService";
 import { useDebounce } from "../../hooks/useDebounce";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import { UserTableRow } from "./userTableRow";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
 
 const filtersInitialValues = {
   name: ""
@@ -79,24 +85,30 @@ function UserList() {
       </Box>
       {
         loading ? <LoadingScreen /> : users.length > 0 &&
-          <table border={1} cellPadding={6}>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td>{user.id}</td>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                </tr>
+          <Table
+            sx={{
+              minWidth: 650,
+              '& .MuiTableCell-head': {
+                backgroundColor: '#f5f5f5',
+                fontWeight: 600,
+                borderTopLeftRadius: 6,
+                borderTopRightRadius: 6
+              },
+            }}
+          >
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ width: '10%' }}>ID</TableCell>
+                <TableCell sx={{ width: '40%' }}>Name</TableCell>
+                <TableCell sx={{ width: '50%' }}>Email</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {users.map(row => (
+                <UserTableRow key={row.id} row={row} />
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
       }
     </Container>
   );

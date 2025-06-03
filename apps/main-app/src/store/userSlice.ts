@@ -1,14 +1,10 @@
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { createSlice } from '@reduxjs/toolkit'
+import type { IUser } from '../features/users/types'
 
-export interface User {
-  id: number
-  name: string
-  email: string
-}
 
 interface UsersState {
-  users: User[]
+  users: IUser[]
   loading: boolean
   error: string | null
 }
@@ -27,7 +23,7 @@ export const usersSlice = createSlice({
       state.loading = true
       state.error = null
     },
-    fetchUsersSuccess: (state, action: PayloadAction<User[]>) => {
+    fetchUsersSuccess: (state, action: PayloadAction<IUser[]>) => {
       state.users = action.payload
       state.loading = false
     },
