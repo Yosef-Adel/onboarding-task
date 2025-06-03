@@ -67,7 +67,6 @@ function UserList() {
           </Button>
         }
       />
-      <h1>still need to use tanstack tables</h1>
 
       <Box sx={{ my: 2 }}>
         <TextField
@@ -79,7 +78,7 @@ function UserList() {
         />
       </Box>
       {
-        loading ? <LoadingScreen /> :
+        loading ? <LoadingScreen /> : users.length > 0 &&
           <table border={1} cellPadding={6}>
             <thead>
               <tr>
