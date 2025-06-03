@@ -7,7 +7,7 @@ export const AppRoutes = createBrowserRouter([
     path: "/",
     element: <RootLayout />,
     children: [
-      { index: true, element: <UserList /> },
+      { index: true, element: <UserList /> }
     ],
     // Add errorElement
   }
