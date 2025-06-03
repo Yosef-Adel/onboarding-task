@@ -6,17 +6,18 @@ import Container from "@mui/material/Container";
 import { Link as RouterLink } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux'
 import type { AppDispatch, RootState } from "../../store";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fetchUsers, type UsersFilters } from "./userService";
 import { useDebounce } from "../../hooks/useDebounce";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import { UserTableRow } from "./userTableRow";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import TableCell from "@mui/material/TableCell";
+
+import {
+  MaterialReactTable,
+  useMaterialReactTable,
+  type MRT_ColumnDef,
+} from 'material-react-table';
+import type { IUser } from "./types";
 
 const filtersInitialValues = {
   name: ""
@@ -35,8 +36,34 @@ function UserList() {
     return () => sub.unsubscribe()
   }, [dispatch, debouncedFilters])
 
-  if (error) return <p>Error: {error}</p>
 
+  const columns = useMemo<MRT_ColumnDef<IUser>[]>(
+    () => [
+      {
+        accessorKey: 'id',
+        header: 'ID',
+        size: 50,
+      },
+      {
+        accessorKey: 'name',
+        header: 'Name',
+        size: 150,
+      },
+      {
+        accessorKey: 'email',
+        header: 'Email',
+        size: 200,
+      },
+    ],
+    [],
+  );
+
+  const table = useMaterialReactTable({
+    columns,
+    data: users,
+  });
+
+  if (error) return <p>Error: {error}</p>
   return (
     <Container sx={{ pt: 4 }}>
       <CustomBreadCrumbs
@@ -85,30 +112,7 @@ function UserList() {
       </Box>
       {
         loading ? <LoadingScreen /> : users.length > 0 &&
-          <Table
-            sx={{
-              minWidth: 650,
-              '& .MuiTableCell-head': {
-                backgroundColor: '#f5f5f5',
-                fontWeight: 600,
-                borderTopLeftRadius: 6,
-                borderTopRightRadius: 6
-              },
-            }}
-          >
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ width: '10%' }}>ID</TableCell>
-                <TableCell sx={{ width: '40%' }}>Name</TableCell>
-                <TableCell sx={{ width: '50%' }}>Email</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users.map(row => (
-                <UserTableRow key={row.id} row={row} />
-              ))}
-            </TableBody>
-          </Table>
+          <MaterialReactTable table={table} />
       }
     </Container>
   );
