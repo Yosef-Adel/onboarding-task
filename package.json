@@ -2,7 +2,8 @@
   "private": true,
   "scripts": {
     "ui:dev": "npm run dev --workspace=@my-workspace/ui",
-    "app:dev": "npm run dev --workspace=main-app"
+    "app:dev": "npm run dev --workspace=main-app",
+    "server:dev": "npm run dev --workspace=server"
   },
   "workspaces": [
     "apps/*",
