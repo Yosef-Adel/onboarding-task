@@ -1,16 +1,21 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Link from '@mui/material/Link';
 import { Box, Stack } from '@mui/material';
+import { BreadcrumbsLink } from './BreadcrumbLink';
 
+export type BreadcrumbsLinkProps = {
+  name?: string;
+  href?: string;
+};
 export type PropsType = {
   heading?: string;
   action?: React.ReactNode;
-  navigation: React.ReactNode[];
+  links: BreadcrumbsLinkProps[],
 }
 
-export const CustomBreadCrumbs = ({ heading, action, navigation }: PropsType) => {
+export const CustomBreadCrumbs = ({ heading, action, links }: PropsType) => {
+  const lastLink = links[links.length - 1].name;
 
   const renderHeading = (
     <Typography variant="h4" sx={{ mb: 2 }}>
@@ -18,18 +23,19 @@ export const CustomBreadCrumbs = ({ heading, action, navigation }: PropsType) =>
     </Typography>
   );
 
-
-  const renderNavigations = (
+  const renderLinks = (
     <Breadcrumbs separator={<Separator />} >
-      {navigation.map(
-        element =>
-          <Link underline="hover" color="inherit" href="/">
-            {element}
-          </Link>
-      )}
-
+      {links.map((link, index) => (
+        <BreadcrumbsLink
+          key={link.name ?? index}
+          link={link}
+          disabled={link.name === lastLink}
+        />
+      ))}
     </Breadcrumbs>
   );
+
+
 
   const renderAction = <Box sx={{ flexShrink: 0 }}> {action} </Box>;
   return (
@@ -38,7 +44,7 @@ export const CustomBreadCrumbs = ({ heading, action, navigation }: PropsType) =>
         <Box sx={{ flexGrow: 1 }}>
           {heading && renderHeading}
 
-          {!!navigation.length && renderNavigations}
+          {!!links.length && renderLinks}
         </Box>
 
         {action && renderAction}
