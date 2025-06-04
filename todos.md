@@ -5,3 +5,4 @@
 5. Implement toast( notificate if user created or deleted) use rxjs
 6. Search of a better way to make the users list reload (don't reload all the list)
 7. try to use most of the operators in rxjs
+8. create RHF fileds with tanstack form fileds it will be better than writing all this code each time
