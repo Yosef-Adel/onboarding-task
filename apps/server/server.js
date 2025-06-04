@@ -49,7 +49,8 @@ app.get('/users', async (req, res) => {
 });
 
 // POST /users
-app.post('/users', async(req, res) => {
+app.post('/users', async (req, res) => {
+  console.log(req)
   const { name, email } = req.body;
   delay(700)
 
