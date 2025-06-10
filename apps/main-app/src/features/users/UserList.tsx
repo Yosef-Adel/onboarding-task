@@ -1,80 +1,98 @@
-import { CustomBreadCrumbs, LoadingScreen } from "@my-workspace/ui";
-import Button from '@mui/material/Button';
-import { Icon } from '@iconify/react';
-import Container from "@mui/material/Container";
-import { useDispatch, useSelector } from 'react-redux'
-import type { AppDispatch, RootState } from "../../store";
 import { useEffect, useMemo, useState } from "react";
-import { fetchUsers, type UsersFilters } from "./userService";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router";
+import { CustomBreadCrumbs, LoadingScreen, notify } from "@my-workspace/ui";
 import { useDebounce } from "../../hooks/useDebounce";
-import TextField from "@mui/material/TextField";
+import { useBoolean } from "../../hooks/useBoolean";
+import { createUser, deleteUser, fetchUsers, type UsersFilters } from "./userService";
+import { addUser, deleteUser as deleteUserAction } from "../../store/userSlice";
+import type { AppDispatch, RootState } from "../../store";
+import type { IUser } from "./types";
+
+import Container from "@mui/material/Container";
+import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import { MenuItem, ListItemIcon, Typography } from "@mui/material";
+import { Icon } from "@iconify/react";
 
 import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
-} from 'material-react-table';
-import type { IUser } from "./types";
-import UserDialog from "./UserDialog";
-import { ListItemIcon, MenuItem, Typography } from "@mui/material";
+} from "material-react-table";
 
-const filtersInitialValues = {
-  name: ""
-}
+import UserEditNewDialog from "./UserNewEditDialog";
+
+const filtersInitialValues = { name: "" };
 
 function UserList() {
-  const dispatch = useDispatch<AppDispatch>()
-  const { users, loading, error } = useSelector((state: RootState) => state.users)
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
+  const { users, loading, error } = useSelector((state: RootState) => state.users);
 
-  const [filters, setFilters] = useState<UsersFilters>(filtersInitialValues)
-  const debouncedFilters = useDebounce(filters, 300)
+  const [filters, setFilters] = useState<UsersFilters>(filtersInitialValues);
+  const debouncedFilters = useDebounce(filters, 300);
 
-  const [openDialog, setOpenDialog] = useState(false);
+  const dialog = useBoolean();
 
+  // Fetch users based on debounced filters
   useEffect(() => {
-    const sub = fetchUsers(dispatch, debouncedFilters).subscribe()
-    return () => sub.unsubscribe()
-  }, [dispatch, debouncedFilters])
+    const sub = fetchUsers(dispatch, debouncedFilters).subscribe();
+    return () => sub.unsubscribe();
+  }, [dispatch, debouncedFilters]);
 
+  // Create new user
+  const onSubmit = async (value: Omit<IUser, "id">) => {
+    try {
+      const user = await createUser(value);
+      dispatch(addUser(user));
+      notify({ msg: "User created successfully!", type: "success", duration: 3000 });
+      dialog.onFalse();
+    } catch (error: unknown) {
+      if (error instanceof Error) console.error(error.message);
+      notify({ msg: "Failed to create user.", type: "error", duration: 3000 });
+    }
+  };
 
+  // Delete user
+  const handleDeleteUser = async (id: number) => {
+    try {
+      await deleteUser(id);
+      dispatch(deleteUserAction(id));
+      notify({ msg: "User Deleted successfully" });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Columns definition for the user table
   const columns = useMemo<MRT_ColumnDef<IUser>[]>(
     () => [
-      {
-        accessorKey: 'id',
-        header: 'ID',
-        size: 50,
-      },
-      {
-        accessorKey: 'name',
-        header: 'Name',
-        size: 150,
-      },
-      {
-        accessorKey: 'email',
-        header: 'Email',
-        size: 200,
-      },
+      { accessorKey: "id", header: "ID", size: 50 },
+      { accessorKey: "name", header: "Name", size: 150 },
+      { accessorKey: "email", header: "Email", size: 200 },
     ],
-    [],
+    []
   );
 
+  // Table configuration
   const table = useMaterialReactTable({
     columns,
     data: users,
     enableRowActions: true,
     initialState: {
       columnPinning: {
-        right: ['mrt-row-actions'],
+        right: ["mrt-row-actions"],
       },
     },
     renderRowActionMenuItems: ({ closeMenu, row }) => [
       <MenuItem
-        key={0}
+        key="view"
         onClick={() => {
-          console.log(row)
           closeMenu();
+          navigate(`users/${row.original.id}`);
         }}
         sx={{ m: 0 }}
       >
@@ -84,9 +102,9 @@ function UserList() {
         View User
       </MenuItem>,
       <MenuItem
-        key={1}
+        key="delete"
         onClick={() => {
-          console.log(row)
+          handleDeleteUser(row.original.id);
           closeMenu();
         }}
         sx={{ m: 0 }}
@@ -94,25 +112,21 @@ function UserList() {
         <ListItemIcon>
           <Icon color="red" icon="ic:round-delete" width="24" height="24" />
         </ListItemIcon>
-        <Typography color="error">
-          Delete User
-        </Typography>
+        <Typography color="error">Delete User</Typography>
       </MenuItem>,
     ],
   });
 
-  if (error) return <p>Error: {error}</p>
+  if (error) return <p>Error: {error}</p>;
+
   return (
     <Container sx={{ pt: 4 }}>
       <CustomBreadCrumbs
         heading="Users"
-        links={[
-          { name: "Users", href: "/" },
-          { name: "List" }
-        ]}
+        links={[{ name: "Users", href: "/" }, { name: "List" }]}
         action={
           <Button
-            onClick={() => setOpenDialog(true)}
+            onClick={() => dialog.onTrue()}
             variant="contained"
             startIcon={<Icon icon="carbon:add-filled" width="24" height="24" />}
           >
@@ -121,20 +135,22 @@ function UserList() {
         }
       />
 
+      {/* Filters */}
       <Box sx={{ my: 2 }}>
         <TextField
           name="name"
           label="Name"
           type="text"
-          value={filters?.name}
+          value={filters.name}
           onChange={(e) => setFilters({ name: e.target.value })}
         />
       </Box>
-      {
-        loading ? <LoadingScreen /> : users.length > 0 &&
-          <MaterialReactTable table={table} />
-      }
-      <UserDialog open={openDialog} onClose={() => setOpenDialog(false)} />
+
+      {/* Table or Loader */}
+      {loading ? <LoadingScreen /> : users.length > 0 && <MaterialReactTable table={table} />}
+
+      {/* Dialog for Adding New User */}
+      <UserEditNewDialog onSubmit={onSubmit} open={dialog.value} onClose={dialog.onFalse} />
     </Container>
   );
 }
