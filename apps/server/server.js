@@ -68,6 +68,52 @@ app.post('/users', async (req, res) => {
   res.status(201).json(newUser);
 });
 
+// DELETE /users/:id
+app.delete('/users/:id', async (req, res) => {
+  const { id } = req.params;
+  await delay(500);
+
+  const index = users.findIndex(user => user.id === parseInt(id));
+  if (index === -1) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  const deletedUser = users.splice(index, 1);
+  res.json({ message: 'User deleted', user: deletedUser[0] });
+});
+
+// GET /users/:id
+app.get('/users/:id', async (req, res) => {
+  const { id } = req.params;
+  await delay(500);
+
+  const user = users.find(user => user.id === parseInt(id));
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  res.json(user);
+});
+
+
+// PUT /users/:id
+app.put('/users/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name, email } = req.body;
+  await delay(500);
+
+  const user = users.find(user => user.id === parseInt(id));
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  if (name) user.name = name;
+  if (email) user.email = email;
+
+  res.json({ message: 'User updated', user });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+
