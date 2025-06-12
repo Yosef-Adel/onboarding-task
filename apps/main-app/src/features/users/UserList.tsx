@@ -13,7 +13,7 @@ import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import { MenuItem, ListItemIcon, Typography } from "@mui/material";
+import { MenuItem, ListItemIcon, Typography, useTheme } from "@mui/material";
 import { Icon } from "@iconify/react";
 
 import {
@@ -23,12 +23,14 @@ import {
 } from "material-react-table";
 
 import UserEditNewDialog from "./UserNewEditDialog";
+import { ThemeToggleButton } from "../../theme/ThemeToggleButton";
 
 const filtersInitialValues = { name: "" };
 
 function UserList() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const theme = useTheme()
 
   const { users, loading, error } = useSelector((state: RootState) => state.users);
 
@@ -84,7 +86,20 @@ function UserList() {
     enableRowActions: true,
     initialState: {
       columnPinning: {
-        right: ["mrt-row-actions"],
+        right: ['mrt-row-actions'],
+      },
+    },
+    mrtTheme: (theme) => ({
+      baseBackgroundColor: theme.palette.background.default,
+      draggingBorderColor: theme.palette.secondary.main,
+    }),
+    muiTablePaperProps: {
+      sx: {
+        border: '2px',
+        borderColor: theme.palette.table.border,
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderRadius: '8px',
       },
     },
     renderRowActionMenuItems: ({ closeMenu, row }) => [
@@ -123,15 +138,18 @@ function UserList() {
     <Container sx={{ pt: 4 }}>
       <CustomBreadCrumbs
         heading="Users"
-        links={[{ name: "Users", href: "/" }, { name: "List" }]}
+        links={[{ name: "Users" }, { name: "List" }]}
         action={
-          <Button
-            onClick={() => dialog.onTrue()}
-            variant="contained"
-            startIcon={<Icon icon="carbon:add-filled" width="24" height="24" />}
-          >
-            Add User
-          </Button>
+          <>
+            <ThemeToggleButton />
+            <Button
+              onClick={() => dialog.onTrue()}
+              variant="contained"
+              startIcon={<Icon icon="carbon:add-filled" width="24" height="24" />}
+            >
+              Add User
+            </Button>
+          </>
         }
       />
 

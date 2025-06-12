@@ -1,4 +1,4 @@
-import { Box, Button, TextField, Typography } from '@mui/material'
+import { Box, Button, DialogActions, TextField, Typography } from '@mui/material'
 import { useForm } from '@tanstack/react-form'
 import z from "zod/v4"
 import type { AnyFieldApi } from '@tanstack/react-form'
@@ -7,6 +7,7 @@ import type { IUser } from './types'
 /**
  * Schema for validating the form using Zod
  */
+
 const userSchema = z.object({
   name: z.string().min(1, { message: 'Name is required!' }),
   email: z
@@ -52,7 +53,7 @@ export default function UserForm({ user, onSubmit, edit }: Props) {
   });
 
   return (
-    <Box sx={{ mt: 1 }}>
+    <Box sx={{ mt: 1, }}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -63,7 +64,10 @@ export default function UserForm({ user, onSubmit, edit }: Props) {
         {/* Name Field */}
         <form.Field
           name="name"
-          validators={{ onChangeAsyncDebounceMs: 500 }}
+          validators={{
+            onChangeAsyncDebounceMs: 500,
+            onMount: userSchema.shape.name
+          }}
         >
           {(field) => (
             <Box sx={{ mb: 2 }}>
@@ -84,10 +88,13 @@ export default function UserForm({ user, onSubmit, edit }: Props) {
         {/* Email Field */}
         <form.Field
           name="email"
-          validators={{ onChangeAsyncDebounceMs: 500 }}
+          validators={{
+            onChangeAsyncDebounceMs: 500,
+            onMount: userSchema.shape.email
+          }}
         >
           {(field) => (
-            <Box sx={{ mb: 2 }}>
+            <Box >
               <TextField
                 fullWidth
                 label="Email"
@@ -103,22 +110,27 @@ export default function UserForm({ user, onSubmit, edit }: Props) {
           )}
         </form.Field>
 
-        {/* Submit Button */}
-        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-          {([canSubmit, isSubmitting]) => (
-            <Box display="flex" justifyContent="flex-end" mt={2}>
-              <Button
-                type="submit"
-                disabled={!canSubmit}
-                variant='contained'
-                size="large"
-              >
-                {isSubmitting ? '...' : edit ? "Update" : 'Create'}
-              </Button>
-            </Box>
-          )}
-        </form.Subscribe>
+        <DialogActions>
+          {/* Submit Button */}
+          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+            {([canSubmit, isSubmitting]) => {
+              console.log('canSubmit:', canSubmit);
+              return (
+                <Box display="flex" justifyContent="flex-end">
+                  <Button
+                    type="submit"
+                    disabled={!canSubmit}
+                    variant='outlined'
+                    size="large"
+                  >
+                    {isSubmitting ? '...' : edit ? "Update" : 'Create'}
+                  </Button>
+                </Box>
+              );
+            }}
+          </form.Subscribe>
+        </DialogActions>
       </form>
-    </Box>
+    </Box >
   );
 }

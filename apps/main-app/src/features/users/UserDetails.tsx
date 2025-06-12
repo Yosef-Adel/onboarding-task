@@ -73,7 +73,7 @@ export const UserDetails = () => {
       <CustomBreadCrumbs
         heading="User Details"
         links={[
-          { name: "Users", href: "/" },
+          { name: "Users" },
           { name: "User Details" },
         ]}
         action={
