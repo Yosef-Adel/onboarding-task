@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
-import { CustomBreadCrumbs, LoadingScreen, notify } from "@my-workspace/ui";
+import { CustomBreadCrumbs, LoadingScreen, notify, ThemeToggleButton } from "@my-workspace/ui";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useBoolean } from "../../hooks/useBoolean";
 import { createUser, deleteUser, fetchUsers, type UsersFilters } from "./userService";
@@ -23,7 +23,6 @@ import {
 } from "material-react-table";
 
 import UserEditNewDialog from "./UserNewEditDialog";
-import { ThemeToggleButton } from "../../theme/ThemeToggleButton";
 
 const filtersInitialValues = { name: "" };
 

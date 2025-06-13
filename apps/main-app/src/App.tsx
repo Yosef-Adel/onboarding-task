@@ -2,7 +2,7 @@ import { RouterProvider } from "react-router-dom"
 import { AppRoutes } from "./routes/AppRoutes"
 import { ThemeProvider } from "@emotion/react"
 import { CssBaseline } from "@mui/material"
-import { ThemeModeProvider } from "./theme/ThemeProvider"
+import { ThemeModeProvider } from "@my-workspace/ui"
 
 function App() {
   return (
